@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>My Form</title>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAHgbHKDN_If3A2TIVjwYhamEqiuYboyFg&libraries=places&callback=initMap"
+    async defer></script>
+
+    <style>
+    html {
+      height: 100%;
+    }
+
+    body {
+      background-color: #eeeeee;
+      font-family: sans-serif, serif;
+      height: 100%;
+    }
+    nav ul {
+      list-style-type: none;
+      background-color: #aaaaaa;
+      padding: 0;
+      margin: 0;
+      overflow: hidden;
+    }
+    nav li {
+      float: left;
+      background-color: #aaaaaa;
+    }
+    nav li:hover {
+      background-color: #555555;
+    }
+    nav a {
+      display: block;
+      padding: 1em;
+      text-decoration: none;
+      color: white;
+    }
+    #forms-map {
+      display: inline-block;
+      float: left;
+      margin-top: 1em;
+      margin-bottom: 1em;
+      height: 50%;
+      width: 30%;
+    }
+
+    #schedule-form {
+      display: inline-block;
+      float: left;
+      width: 60%;
+      height: 50%;
+      margin-top: 5%;
+    }
+
+    #schedule-form select, #schedule-form input {
+      display: block;
+      margin-left: 45%;
+      margin-top: 1em;
+      margin-bottom: 1em;
+    }
+
+    #schedule-form label {
+      margin-left: 45%;
+    }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <ul>
+        <li><a href="mySchedule.html">My Schedule</a></li>
+        <li><a href="myPlaces.html">My Favorite Places</a></li>
+        <li><a href="myForm.html">Form Input</a></li>
+        <li><a href="myWidgets.html">My Widgets</a></li>
+      </ul>
+    </nav>
+
+    <form id="schedule-form" action="http://localhost:9001" method="POST">
+        <label>Day of the Week</label>
+        <select name="day" required>
+          <option value="" disabled>Select a Day</option>
+          <option value="monday">Monday</option>
+          <option value="tuesday">Tuesday</option>
+          <option value="wednesday">Wednesday</option>
+          <option value="thursday">Thursday</option>
+          <option value="friday">Friday</option>
+          <option value="saturday">Saturday</option>
+          <option value="sunday">Sunday</option>
+        </select>
+
+        <label>Start Time</label>
+        <input type="time" name="start-time" required>
+
+        <label>End Time</label>
+        <input type="time" name="end-time" required>
+
+        <label>Event Name</label>
+        <input type="text" id="event-name" name="event-name" pattern="[A-Za-z0-9]+" required>
+
+        <label>Location</label>
+        <input type="text" id="location" name="location" pattern="[A-Za-z0-9]+" size="35" required>
+
+        <label>Enter a URL for the Picture</label>
+        <input type="url" name="pic-url" placeholder="https://example.com/pic.jpg" size="35" required>
+
+        <input type="submit" value="Submit">
+    </form>
+
+    <div id="forms-map"></div>
+
+    <script>
+    var geocoder;
+    var map;
+    var placesService;
+
+    function initMap() {
+      geocoder = new google.maps.Geocoder();
+      map = new google.maps.Map(document.getElementById('forms-map'), {
+        center: {lat: 44.9727, lng: -93.2354},
+        zoom: 14
+      });
+
+      var input = document.getElementById('location');
+      var autocomplete = new google.maps.places.Autocomplete(input);
+
+      var clickHandler = new ClickEventHandler(map);
+    }
+
+    /**
+     * @constructor
+     */
+    var ClickEventHandler = function(map, origin) {
+      // Listen for clicks on the map.
+      map.addListener('click', this.handleClick.bind(this));
+    };
+
+    ClickEventHandler.prototype.handleClick = function(event) {
+      if (event.placeId) {
+        var placeId = event.placeId;
+        geocoder.geocode({'placeId': placeId}, function(results, status) {
+              if (status === 'OK') {
+                document.getElementById('location').value = results[0].formatted_address;
+              }
+            });
+      }
+      event.stop();
+    };
+    </script>
+  </body>
+</html>
